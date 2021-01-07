@@ -1,3 +1,4 @@
+
 from pyautogui import *
 import pyautogui
 import time
@@ -10,20 +11,57 @@ from os import listdir
 from os.path import isfile, join
 import os
 
+###############This section is for variable init############### 
+start_time=etime = int(time.time())
+tentime = int(time.time())
+fivetime = int(time.time())
+onetime = int(time.time())
+rotationtime = int(time.time())
+redcoretime = int(time.time())
 
 
+hero_1 = ''
+hero_object_1 = ''
+hero_2 = ''
+hero_3 = ''
+hero_4 = ''
+hero_5 = ''
+
+hero_select_setting='lowest'
+#hero_select_setting='last'
+
+
+# picks Default time
+# Would like to go through and set defaults within functions instead.
 dt1 = 0.1
 dt2 = 1
 ft1 = .02
 ft2 = .1
+
+# This is for the first version of the timer, I have written a new timer and need to update code
 epoch_time = int(time.time())
+# This displays debug messages in console if turned on
 debugging = 1
-play_area_y = (120,750)
+
+# This initializes Game_Screen
 game_screen = None
 
+
+# This gets a list of the tab portrait, I would like to create a program that can collect all the portraits
 tab_portrait_directory = os.path.dirname(os.path.realpath(__file__)) + '\\tab_portrait\\'
 tab_portraits = [f for f in listdir(tab_portrait_directory) if isfile(join(tab_portrait_directory, f))]
 
+
+def debug(message):
+    if debugging == 1:
+        print(message)
+
+
+
+
+###############This section should be to control inputs###############
+
+# Finds a picture and clicks on it
 def click_screen(pic, confid, offsetx, offsety):
     screen = pyautogui.locateOnScreen(pic, confidence=confid)
     if screen != None:
@@ -31,6 +69,7 @@ def click_screen(pic, confid, offsetx, offsety):
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
         return True
+# This clicks on the screen only using a region which should make it faster than click_Screen
 def click_region(pic, confid, x, y, width, height, offsetx, offsety):
     region = pyautogui.locateOnScreen(pic, region=(x,y,width,height), confidence=confid)
     if region != None:
@@ -38,72 +77,36 @@ def click_region(pic, confid, x, y, width, height, offsetx, offsety):
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
         return True
+# This checks a region but does not click on it.
 def check_region(pic, confid, x, y, width, height, offsetx, offsety):
     region = pyautogui.locateOnScreen(pic, region=(x,y,width,height), confidence=confid)
     if region != None:
         return True
-def debug(message):
-    if debugging == 1:
-        print(message)
+# This Moves the cursor and adds a delay
 def move_cursor(x,y,t1,t2):
     time.sleep(random.uniform(t1,t2))
     win32api.SetCursorPos((x,y))
+# This clicks on the screen with a delay
 def click(x,y,t1=.1,t2=1):
     time.sleep(random.uniform(t1,t2))
     win32api.SetCursorPos((x,y))
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
+# This Right Clicks
 def right_click(x,y):
     win32api.SetCursorPos((x,y))
     win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN,0,0)
     win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP,0,0)
+# This only left clicks with no location
 def left_click(t1,t2):
     time.sleep(random.uniform(t1,t2))
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
-def talent_picker():
-    newtalent = pyautogui.locateOnScreen('newtalent.png', region=(35,1000,160,1060), confidence=0.9)
-    if newtalent != None:
-        debug('newtalent Found!')
-        talent_open = pyautogui.locateOnScreen('talent_open.png', region=(10,790,50,840), confidence=0.9)
-        if talent_open == None:
-            click(newtalent.left, newtalent.top,dt1,dt2)
-        talent_fav = pyautogui.locateOnScreen('talent_fav.png', region=(0,400,100,800), confidence=0.9)
-        if talent_fav != None:
-            click(talent_fav.left, talent_fav.top,dt1,dt2)
-   
-def rotation():
-    if aim(25, 50):
-        pyautogui.hotkey('q')
-        left_click(dt1,dt2)
-    if aim(25, 50):
-        pyautogui.hotkey('w')
-        left_click(dt1,dt2)
-    if aim(25, 50):
-        pyautogui.hotkey('e')
-        left_click(dt1,dt2)
-    if aim(25, 50):
-        pyautogui.hotkey('r')
-        left_click(dt1,dt2)
-
+# hits a key with timer
 def hit_key(key,t1,t2):
     time.sleep(random.uniform(t1,t2))
     pyautogui.hotkey(key)
-def attack_core(left, top):
-    debug('redcore Found!')
-    move_cursor(left+30, top+15,dt1,dt2)
-    hit_key('a',dt1,dt2)
-    hit_key(' ',dt1,dt2)
-def hat():
-    healthbar = pyautogui.locateOnScreen('healthbar.png', confidence=0.8)
-    if healthbar != None:
-        move_cursor(healthbar.left+75, healthbar.top+100,dt1,dt2)
-        pyautogui.hotkey('q')
-        #debug('healthbar found!')
-def check_hotbar_ready(pic):
-    hotbar = pyautogui.locateOnScreen(pic, region=(650,980,1919,1079), confidence=0.8)
-    if hotbar != None:
-        return True
+# clicks just the minimap based on picture input
 def click_mini_map(pic, offsetx, offsety, confid, gscale):
     mini_map = pyautogui.locateOnScreen(pic, region=(1389,715,1919,1079), confidence=confid, grayscale=gscale)
     if mini_map != None:
@@ -113,6 +116,7 @@ def click_mini_map(pic, offsetx, offsety, confid, gscale):
         return True
     else:
         return False
+# This sends a command to attack the minimap based on picture input
 def attack_mini_map(pic, offsetx, offsety, confid, gscale):
     mini_map = pyautogui.locateOnScreen(pic, region=(1389,715,530,364), confidence=confid, grayscale=gscale)
     if mini_map != None:
@@ -122,24 +126,16 @@ def attack_mini_map(pic, offsetx, offsety, confid, gscale):
         return True
     else:
         return False
-def aim(offsetx, offsety):
-    debug('Checking for Enemy!')
-    time.sleep(random.uniform(0.05,0.1))
-    enemy = pyautogui.locateOnScreen('enemy_health_bar.png', region=(500,150,1400,800), confidence=0.8)
-    if enemy != None:
-        debug('Enemy Found!')
-        win32api.SetCursorPos((enemy.left + offsetx, enemy.top + offsety))
-        return True
-def check_gamemode():
-    prim = pyautogui.locateOnScreen('prim.png', region=(40,870,175,920), confidence=0.9)
-    if prim != None:
-        debug('Portrait Found! Remaining in Gamemode 1')
-        return 1
-    else:
-        if pyautogui.locateOnScreen('browse_all_heroes.png') != None:
-            return 2
-        else:
-            return 0
+def ability_unit_target(x,y,key):
+    win32api.SetCursorPos((x+50, y+100))
+    pyautogui.hotkey(key)
+
+def ability_self_target(key):
+    pyautogui.hotkey('alt',key)
+
+
+###############This section should be for out of game Macros###############
+
 def select_ban():
     #0,244,380,125 ban
     #0,366,466,125 ban 2
@@ -193,6 +189,90 @@ def select_hero():
     click(1415,820)
     time.sleep(random.uniform(0.1,0.5))
     click(1550,975)
+def select_qm_hero():
+    if check_region('role.png',0.8,350,100,100,50,0,0) != True:
+
+        click(960,600,dt1,dt2)
+    else:
+        if move_cursor_through_heroes_last_row(1295, 820, 660): return True
+        if move_cursor_through_heroes(1749, 740, 740): return True
+        if move_cursor_through_heroes(1790, 660, 825): return True
+        if move_cursor_through_heroes(1830, 580, 908): return True
+        if move_cursor_through_heroes(1790, 500, 825): return True
+        if move_cursor_through_heroes(1745, 420, 740): return True
+        if move_cursor_through_heroes(1705, 340, 660): return True
+        if move_cursor_through_heroes(1662, 260, 567): return True
+
+def move_cursor_through_heroes_last_row(x,y,gap):
+    for i in range (0,7):
+        click(x,y,ft1,ft2)
+        if i == 0:
+            x = x - gap
+        else:
+            x = x - 83
+        click(950,1050,ft1,ft2)
+        if check_region('loadout.png',0.8,0,900,150,170,0,0) != True:
+            return True
+
+def move_cursor_through_heroes(x,y,gap):
+    for i in range (0,12):
+        click(x,y,ft1,ft2)
+        if i == 5:
+            x = x - gap
+        else:
+            x = x - 83
+        click_region('smallready.png',0.8,900,950,150,150,0,0)
+        if check_region('loadout.png',0.8,0,900,150,170,0,0) != True:
+            return True
+
+###############This section should be for in game Macros###############
+
+# This picks Talents
+def talent_picker():
+    newtalent = pyautogui.locateOnScreen('newtalent.png', region=(35,1000,160,1060), confidence=0.9)
+    if newtalent != None:
+        debug('newtalent Found!')
+        talent_open = pyautogui.locateOnScreen('talent_open.png', region=(10,790,50,840), confidence=0.9)
+        if talent_open == None:
+            click(newtalent.left, newtalent.top,dt1,dt2)
+        talent_fav = pyautogui.locateOnScreen('talent_fav.png', region=(0,400,100,800), confidence=0.9)
+        if talent_fav != None:
+            click(talent_fav.left, talent_fav.top,dt1,dt2)
+
+# Spams the screen with all abilities all the time
+def default_rotation():
+    if aim(25, 50):
+        pyautogui.hotkey('q')
+        left_click(dt1,dt2)
+    if aim(25, 50):
+        pyautogui.hotkey('w')
+        left_click(dt1,dt2)
+    if aim(25, 50):
+        pyautogui.hotkey('e')
+        left_click(dt1,dt2)
+    if aim(25, 50):
+        pyautogui.hotkey('r')
+        left_click(dt1,dt2)
+
+# attacks core
+def attack_core(left, top):
+    debug('redcore Found!')
+    move_cursor(left+30, top+15,dt1,dt2)
+    hit_key('a',dt1,dt2)
+    hit_key(' ',dt1,dt2)
+
+# Aba Finds Players on screen and hats them
+def hat():
+    healthbar = pyautogui.locateOnScreen('healthbar.png', confidence=0.8)
+    if healthbar != None:
+        move_cursor(healthbar.left+75, healthbar.top+100,dt1,dt2)
+        pyautogui.hotkey('q')
+
+
+###############This section should be for looking at the game screen###############    
+    
+
+
 def check_hero():
     time.sleep(1)
     pyautogui.keyDown('f1')
@@ -211,6 +291,47 @@ def check_hero():
     pyautogui.keyUp('f1')
     return 'default'
 
+
+# checks hotbar to see if complete
+def check_hotbar_ready(pic):
+    hotbar = pyautogui.locateOnScreen(pic, region=(650,980,1919,1079), confidence=0.8)
+    if hotbar != None:
+        return True
+
+
+def check_gamemode():
+    prim = pyautogui.locateOnScreen('prim.png', region=(40,870,175,920), confidence=0.9)
+    if prim != None:
+        debug('Portrait Found! Remaining in Gamemode 1')
+        return 1
+    else:
+        if pyautogui.locateOnScreen('browse_all_heroes.png') != None:
+            return 2
+        else:
+            return 0
+
+
+
+###############This section Needs rework###############   
+
+# Targets an enemy on screen and moves the mouse
+# Need to fix aim so that it returns screen positions instead of setting cursor or something...
+def aim(offsetx, offsety):
+    debug('Checking for Enemy!')
+    time.sleep(random.uniform(0.05,0.1))
+    enemy = pyautogui.locateOnScreen('enemy_health_bar.png', region=(500,150,1400,800), confidence=0.8)
+    if enemy != None:
+        debug('Enemy Found!')
+        win32api.SetCursorPos((enemy.left + offsetx, enemy.top + offsety))
+        return True
+
+
+
+
+
+###############This section is for Classes###############  
+
+
 class check_game():
     def __init__(self):
         self.blue_side = None
@@ -223,31 +344,19 @@ class check_game():
             else:
                 self.blue_side = 'right'
                 debug('Detected Blue side is on Right')
-    def blue_hero_location(self):
-        return pyautogui.locateAllOnScreen('ally_health_bar.png', confidence=0.8)
-    def red_hero_location(self):
-        return pyautogui.locateAllOnScreen('enemy_health_bar.png', confidence=0.8)
-    def red_minion_location(self):
-        return pyautogui.locateAllOnScreen('enemy_minion_bar.png', confidence=0.8)
-    def red_structure_location(self):
-        return pyautogui.locateAllOnScreen('enemy_structure_bar.png', confidence=0.8)
         
     def parsed_blue_hero_locations(self):
-        #debug('parsed blue hero')
-        return self.parse_locations(self.blue_hero_location())
+        return self.parse_locations(pyautogui.locateAllOnScreen('ally_health_bar.png', confidence=0.8))
     def parsed_red_hero_locations(self): 
-        #debug('parsed red hero')
-        return self.parse_locations(self.red_hero_location())
+        return self.parse_locations(pyautogui.locateAllOnScreen('enemy_health_bar.png', confidence=0.8))
     def parsed_red_minion_locations(self): 
-        return self.parse_locations(self.red_minion_location())
+        return self.parse_locations(pyautogui.locateAllOnScreen('enemy_minion_bar.png', confidence=0.8))
     def parsed_red_structure_locations(self): 
-        return self.parse_locations(self.red_structure_location())
+        return self.parse_locations(pyautogui.locateAllOnScreen('enemy_structure_bar.png', confidence=0.8))
         
     def closest_red(self): 
-        #debug('closest_red')
         return self.find_closest(self.parsed_red_hero_locations(), ((960,450)))
     def opposite_closest_red(self): 
-        #debug('opposite_closest_red')
         return self.find_opposite_closest(self.closest_red())
    
    
@@ -378,6 +487,8 @@ class hero_object:
         else:
             debug('Found Standard Mount')
             self.non_standard_mount = False
+
+### AI
     def prioritize(self):
         self.stick_team = 'off'
         self.heal_others = 'off'
@@ -423,8 +534,6 @@ class hero_object:
                 self.stay_alive = 'on'
                 self.hearth = 'on'
             return
-
-
     def debug_prioritize(self):
         self.stick_team = 'on'
         self.heal_others = 'off'
@@ -469,6 +578,8 @@ class hero_object:
         if self.mount == 'on':
             debug('Mounting')
             self.action_mount()
+
+### Actions
     def action_heal_others(self):
 
         lowest = game_screen.find_lowest_ally_healthbar()
@@ -503,7 +614,6 @@ class hero_object:
                         self.action_hotbar('d','allies')
                     if self.d_target == 'allies none':
                         self.action_hotbar('d','allies none')
-
     def action_attack(self):
         location = game_screen.closest_red()
         self.target = 'enemy'
@@ -520,8 +630,7 @@ class hero_object:
             self.action_hotbar('r','enemy')
         if self.d_type == 'attack':
             self.action_hotbar('d','enemy')
-        #self.step_away()
-    def step_away(self):
+    def action_step_away(self):
         location = game_screen.opposite_closest_red()
         if location != None:
             if location[0] > 1260:
@@ -554,7 +663,7 @@ class hero_object:
             if self.q_target == 'unit':
                 self.action_hotbar('q','self')
     def action_stick_team_screen(self):
-        ally_locations = game_screen.blue_hero_location()
+        ally_locations = game_screen.parsed_blue_hero_location()
         if ally_locations != None:
             location = None
             for ally_location in ally_locations:
@@ -569,7 +678,6 @@ class hero_object:
                 location = ((random.randrange(100,200)), random.randrange(400,450))
             if location != None:
                 _thread.start_new_thread(right_click,(location[0]+10,location[1]+50))
-        
     def action_find_team(self):
         
         ally_location = self.find_ally_mini_map()
@@ -581,16 +689,13 @@ class hero_object:
             win32api.SetCursorPos((ally_location[0]+15,ally_location[1]+15))
             pyautogui.hotkey('a')
             self.find_ally_clock.start_timer()
-            #attack_mini_map('redcore.png', 15, 15, 0.8, False)
     def action_hearth(self):
         _thread.start_new_thread(hit_key,('b',dt1,dt2))
         time.sleep(random.uniform(6.1,6.3))
-
     def action_mount(self):
         if pyautogui.locateOnScreen('hotbar\\mounted_hotbar.png', region=(660,1020,120,55)) == None:
             hit_key('z',dt1,dt2)
             time.sleep(random.uniform(1.1,1.3))
-    
     def action_hotbar(self,key,target):
     
         if key == 'q':
@@ -616,11 +721,6 @@ class hero_object:
                 location = game_screen.closest_red()
                 if location != None:
                     _thread.start_new_thread(ability_unit_target,(location[0],location[1],key))
-
-            #if ax != None and ay != None:
-            #    if self.found_target == True:
-            #            _thread.start_new_thread(ability_unit_target,(ax,ay,key))
-
     def target_ally(self):
         locations = game_screen.parsed_blue_hero_locations() 
     
@@ -648,75 +748,13 @@ class clock_timer:
             return False
     def reset_timer(self):
         self.start_time = 0         
-#play location 960,450            
-        #right_click(50,500)
-def ability_unit_target(x,y,key):
-    win32api.SetCursorPos((x+50, y+100))
-    pyautogui.hotkey(key)
-
-def ability_self_target(key):
-    pyautogui.hotkey('alt',key)
-
-def select_qm_hero():
-    if check_region('role.png',0.8,350,100,100,50,0,0) != True:
-
-        click(960,600,dt1,dt2)
-    else:
-        if move_cursor_through_heroes_last_row(1295, 820, 660): return True
-        if move_cursor_through_heroes(1749, 740, 740): return True
-        if move_cursor_through_heroes(1790, 660, 825): return True
-        if move_cursor_through_heroes(1830, 580, 908): return True
-        if move_cursor_through_heroes(1790, 500, 825): return True
-        if move_cursor_through_heroes(1745, 420, 740): return True
-        if move_cursor_through_heroes(1705, 340, 660): return True
-        if move_cursor_through_heroes(1662, 260, 567): return True
-def move_cursor_through_heroes_last_row(x,y,gap):
-    for i in range (0,7):
-        click(x,y,ft1,ft2)
-        if i == 0:
-            x = x - gap
-        else:
-            x = x - 83
-        click(950,1050,ft1,ft2)
-        if check_region('loadout.png',0.8,0,900,150,170,0,0) != True:
-            return True
-
-def move_cursor_through_heroes(x,y,gap):
-    for i in range (0,12):
-        click(x,y,ft1,ft2)
-        if i == 5:
-            x = x - gap
-        else:
-            x = x - 83
-        click_region('smallready.png',0.8,900,950,150,150,0,0)
-        if check_region('loadout.png',0.8,0,900,150,170,0,0) != True:
-            return True
 
 
-# Rows 260 add 80 each 820 time 8 rows
-# columns 83 apart
-# 1705 1625 1538
-start_time=etime = int(time.time())
-tentime = int(time.time())
-fivetime = int(time.time())
-onetime = int(time.time())
-rotationtime = int(time.time())
-redcoretime = int(time.time())
-hero = 'default'
-hero = 'abathur'
 
-hero_1 = ''
-hero_object_1 = ''
-hero_2 = ''
-hero_3 = ''
-hero_4 = ''
-hero_5 = ''
 
-hero_select_setting='lowest'
-#hero_select_setting='last'
 
+###############Main Loop############### 
 gamemode = check_gamemode()
-
 while keyboard.is_pressed('p') == False:
     #debug('getting etime')
     etime = int(time.time())
